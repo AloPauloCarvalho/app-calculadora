@@ -1,46 +1,57 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [numInput, setCount] = useState(0)
-  const [operator, setOperator] = useState()
+  const [arrOperatorDisplay, setArrOperatorDisplay] = useState([]);
 
-  
-
-  function handleOperationInput() {
-    
+  function handleOperationInput(input) {
+    setArrOperatorDisplay((arr) => {
+      if (Number.isInteger(input)) {
+        if (arr.length > 0 && Number.isInteger(arr[arr.length - 1])) {
+          const tempArr = [...arr]; 
+          tempArr[tempArr.length - 1] = tempArr[tempArr.length - 1].toString() + input.toString();
+          return tempArr; 
+        }
+      }
+      return [...arr, input]; 
+    });
   }
 
   return (
     <>
-      <h1>{numInput}</h1>
-      
+      <h1>{...arrOperatorDisplay}</h1>
+
       <div className="card">
-        {[...Array(10).keys()].map((num) => (
+        {[...Array(10).keys()].map((numInput) => (
           <button
-          key={num}
-          type='button'
-          onClick={() => setCount((numInput) => numInput = num)}
+            key={numInput}
+            type='button'
+            onClick={() => handleOperationInput(numInput)}
           >
-            {num}
+            {numInput}
           </button>
         ))}
       </div>
 
       <div>
-        {['+','-','*','➗'].map((operatorInput) => (
+        {['+', '-', '*', '/'].map((operatorInput) => (
           <button
-          key={operatorInput}
-          type='button'
-          onClick={() => setOperator((operator) => operator = operatorInput)}
+            key={operatorInput}
+            type='button'
+            onClick={() => handleOperationInput(operatorInput)}
           >
             {operatorInput}
           </button>
         ))}
       </div>
-      
+
+      <div>
+        <button
+          onClick={() => setArrOperatorDisplay([])}>
+          Clear
+        </button>
+      </div>
+
     </>
   )
 }
