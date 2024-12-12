@@ -37,29 +37,53 @@ function App() {
     console.log(arrOperatorMemory);
   }
 
+
+  //0 - função que calcula 
+  function calcular(x, y, operator) {
+    switch (operator) {
+      case '+':
+        return x + y;
+      case '-':
+        return x - y;
+      case '*':
+        return x * y;
+      case '/':
+        if (y === 0) {
+          //exibir erro no display de resultado
+          throw new Error('Err');
+        }
+        return x / y;
+    }
+  }
+
+  // 0- função que executa a expressão armazenada no arrOperatorMemory
   function handleOperationResult(arr) {
     setNumOperationResult(() => {
-      // 3 - último index ser um operador
+      let tempArr = [...arr];
 
-      let result = arr[0];
-      for (let i = 1; i < arr.length - 2; i += 2) {
-        switch (arr[i]) {
-          case '+':
-            result += arr[i + 1];
-            break;
-          case '-':
-            result -= arr[i + 1];
-            break;
-          case '*':
-            result += arr[i + 1];
-            break;
-          case '/':
-            result += arr[i + 1];
-            break;
+      // 0- último index não pode ser um operador
+      if (!Number.isInteger(tempArr[tempArr.length - 1])) {
+        tempArr.pop();
+      }
+
+      // 1- operadores de multiplicação e divisão
+      for (let i = 0; i < tempArr.length; i++) {
+        if (['*', '/'].includes(tempArr[i])) {
+          tempArr.splice(i-1, 3, calcular(tempArr[i-1], tempArr[i+1], tempArr[i]));
+          i--;
         }
       }
 
-      return result;
+      // 2- operadores de soma e subtração
+      for (let i = 0; i < tempArr.length; i++) {
+        if (['+', '-'].includes(tempArr[i])) {
+          tempArr.splice(i-1, 3, calcular(tempArr[i-1], tempArr[i+1], tempArr[i]));
+          i--;
+        }
+      }
+
+      console.log(tempArr)
+      return tempArr[0];
     })
   }
 
