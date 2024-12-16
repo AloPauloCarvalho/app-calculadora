@@ -15,16 +15,50 @@ function App() {
         return arr;
       }
 
-      // 1.5 - se existir resultado de uma conta prévia e o input for um operador (ver como não atualizar a memoria mesmo depois do =)
-      if ((numOperationResult && !Number.isInteger(input))) {
+      // 1.5 - caso exista resultado de uma conta prévia e o input for um operador, inicie nova operação com o resultado anterior
+      if ((numResultSetted && !Number.isInteger(input))) {
+        setNumResultSetted(false);
         return [numOperationResult, input];
       }
 
-      // 2- não podem existir dois operadores seguidos, ao menos q seja um '-' depois de '*' ou '/'
-      if (!Number.isInteger(input) && ['*', '/', '+'].includes(arr[arr.length - 1])) {
-        const tempArr = [...arr];
-        tempArr[tempArr.length - 1] = input;
-        return tempArr;
+      // 2- tratamento dos operadores considerando possibilidade de números negativos
+      if (!Number.isInteger(input)) {
+        //permite divisão e multiplicação por negativo, sem deixar existir um terceiro operador
+        if (['*', '/'].includes(arr[arr.length - 2]) && arr[arr.length - 1] === '-') {
+          const tempArr = [...arr];
+          tempArr.pop();
+          tempArr[tempArr.length - 1] = input;
+          return tempArr;
+        }
+
+        //não pode existir um operador depois do '-'
+        if (!Number.isInteger(arr[arr.length - 2]) && arr[arr.length - 1] === '-') {
+          return arr;
+        }
+
+        // não pode existir dois operadores iguais seguidos
+        if (arr[arr.length - 1] === input) {
+          return arr;
+        }
+
+        // caso seja multiplicação ou divisão, próximo operador pode indicar número negativo
+        if (['*', '/'].includes(arr[arr.length - 1]) && input === '-') {
+          //se for um operador negativo seguido
+          if (arr.length > 2 && !Number.isInteger(arr[arr.length - 2])) {
+            const tempArr = [...arr];
+            tempArr[tempArr.length - 1] = input;
+            return tempArr;
+          }
+          return [...arr, input];
+        }
+
+        
+        //caso não seja nenhuma das excessões e exista um operador no index anterior, ele é substituido pelo novo operador
+        if (['-', '*', '/', '+'].includes(arr[arr.length - 1])) {
+          const tempArr = [...arr];
+          tempArr[tempArr.length - 1] = input;
+          return tempArr;
+        }
       }
 
       // 3- caso o último input seja um número e input anterior também, concatena esse input com o número anterior
@@ -55,7 +89,7 @@ function App() {
         tempArr.pop();
       }
 
-      return eval(tempArr.toString().replaceAll(',', ''));
+      return eval(tempArr.toString().replaceAll(',', '')); //resolver casos de floats muito grandes
     })
   }
 
