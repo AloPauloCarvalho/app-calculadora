@@ -17,6 +17,13 @@ function App() {
 
       // 1.5 - caso exista resultado de uma conta prévia, inicie nova operação com o resultado anterior ao clicar em um operador
       if (numResultSetted) {
+        if(numOperationResult === 'Erro'){
+          setNumResultSetted(false)
+          setNumOperationResult(0)
+          setArrOperatorMemory([]);
+          return handleOperationInput(input);
+        }
+
         if (!Number.isInteger(input)) {
           setNumResultSetted(false);
           return [numOperationResult, input];
@@ -27,6 +34,8 @@ function App() {
 
       // 2- tratamento dos operadores considerando possibilidade de números negativos
       if (!Number.isInteger(input)) {
+
+
         //permite divisão e multiplicação por negativo, sem deixar existir um terceiro operador
         if (['*', '/'].includes(arr[arr.length - 2]) && arr[arr.length - 1] === '-') {
           const tempArr = [...arr];
@@ -58,7 +67,7 @@ function App() {
 
 
         //caso não seja nenhuma das excessões e exista um operador no index anterior, ele é substituido pelo novo operador
-        if (['-', '*', '/', '+'].includes(arr[arr.length - 1])) {
+        if (['-', '*', '/', '+', '.'].includes(arr[arr.length - 1])) {
           const tempArr = [...arr];
           tempArr[tempArr.length - 1] = input;
           return tempArr;
@@ -89,25 +98,42 @@ function App() {
       let tempArr = [...arr];
 
       // 1- último index não pode ser um operador
-      if (!Number.isInteger(tempArr[tempArr.length - 1])) {
+      while (tempArr.length > 0 && !Number.isInteger(tempArr[tempArr.length - 1])) {
         tempArr.pop();
       }
 
-      return eval(tempArr.toString().replaceAll(',', '')); //resolver casos de floats muito grandes
+      //atualiza o display sem os operadores no final
+      setArrOperatorMemory(tempArr);
+
+      const expressaoTratada = tempArr.join('').replace(',', '.');
+
+      //trata decimais e dizimas periodicas
+      try {
+        const result = eval(expressaoTratada);
+
+      // seila pq mas quando chega perto de 0, ele retorna -0, coisa de maluco
+      if (Object.is(result, -0)) {
+        result = 0;
+      }
+
+        return result.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 3});
+      } catch (error) {
+        return 'Erro';
+      }
     })
   }
 
-  function handleBackspace(){
+  function handleBackspace() {
     setArrOperatorMemory((arr) => {
-      if(arr.length === 0) return arr;
+      if (arr.length === 0) return arr; //não pode dar backspace no arr vazio
 
       const tempArr = [...arr];
-      const lastInput = tempArr[tempArr.length -1];
+      const lastInput = tempArr[tempArr.length - 1];
 
-      if(Number.isInteger(lastInput) && lastInput.length > 1){
-        tempArr[tempArr.length - 1] = lastInput.slice(0, -1);
+      if (Number.isInteger(lastInput) && lastInput.length > 1) {
+        tempArr[tempArr.length - 1] = lastInput.slice(0, -1); //caso seja numero
       } else {
-        tempArr.pop();
+        tempArr.pop(); //caso seja operador
       }
 
       return tempArr;
@@ -154,7 +180,7 @@ function App() {
           Clear
         </button>
         <button
-        onClick={handleBackspace}>
+          onClick={handleBackspace}>
           Backspace
         </button>
         <button
