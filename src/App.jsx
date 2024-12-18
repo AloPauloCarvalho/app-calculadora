@@ -97,6 +97,23 @@ function App() {
     })
   }
 
+  function handleBackspace(){
+    setArrOperatorMemory((arr) => {
+      if(arr.length === 0) return arr;
+
+      const tempArr = [...arr];
+      const lastInput = tempArr[tempArr.length -1];
+
+      if(Number.isInteger(lastInput) && lastInput.length > 1){
+        tempArr[tempArr.length - 1] = lastInput.slice(0, -1);
+      } else {
+        tempArr.pop();
+      }
+
+      return tempArr;
+    });
+  }
+
 
   return (
     <>
@@ -125,12 +142,20 @@ function App() {
             {operatorInput}
           </button>
         ))}
+
+        <button
+          type='button'
+          onClick={() => handleOperationInput('.')}>.</button>
       </div>
 
       <div>
         <button
           onClick={() => { setArrOperatorMemory([]); setNumOperationResult(0); setNumResultSetted(false) }}>
           Clear
+        </button>
+        <button
+        onClick={handleBackspace}>
+          Backspace
         </button>
         <button
           onClick={() => handleOperationResult(arrOperatorMemory)}>
