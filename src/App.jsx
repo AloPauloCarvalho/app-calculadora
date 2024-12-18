@@ -15,10 +15,14 @@ function App() {
         return arr;
       }
 
-      // 1.5 - caso exista resultado de uma conta prévia e o input for um operador, inicie nova operação com o resultado anterior
-      if ((numResultSetted && !Number.isInteger(input))) {
-        setNumResultSetted(false);
-        return [numOperationResult, input];
+      // 1.5 - caso exista resultado de uma conta prévia, inicie nova operação com o resultado anterior ao clicar em um operador
+      if (numResultSetted) {
+        if (!Number.isInteger(input)) {
+          setNumResultSetted(false);
+          return [numOperationResult, input];
+        }
+
+        return arr;
       }
 
       // 2- tratamento dos operadores considerando possibilidade de números negativos
@@ -52,7 +56,7 @@ function App() {
           return [...arr, input];
         }
 
-        
+
         //caso não seja nenhuma das excessões e exista um operador no index anterior, ele é substituido pelo novo operador
         if (['-', '*', '/', '+'].includes(arr[arr.length - 1])) {
           const tempArr = [...arr];
@@ -125,7 +129,7 @@ function App() {
 
       <div>
         <button
-          onClick={() => { setArrOperatorMemory([]); setNumOperationResult(0) }}>
+          onClick={() => { setArrOperatorMemory([]); setNumOperationResult(0); setNumResultSetted(false) }}>
           Clear
         </button>
         <button
